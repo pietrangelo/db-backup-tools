@@ -1,0 +1,74 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: backup-postgresql
+  namespace: production
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: cronjob-postgresql-backup
+              image: pmasala/db-backup-tools:0.0.1
+              command: ["bash", "/srv/scripts/postgresql-backup.sh"]
+              env:
+                - name: REMOTE_HOST_PATH
+                  valueFrom:
+                    configMapKeyRef:
+                      key: REMOTE_HOST_PATH
+                      name: cronjob-db-tools
+                - name: BACKUP_NAME_SUFFIX
+                  valueFrom:
+                    configMapKeyRef:
+                      key: BACKUP_NAME_SUFFIX
+                      name: cronjob-db-tools
+                - name: TZ
+                  valueFrom:
+                    configMapKeyRef:
+                      key: TZ
+                      name: cronjob-db-tools
+                - name: USER
+                  valueFrom:
+                    secretKeyRef:
+                      key: USER
+                      name: cronjob-auth-secret
+                - name: PASS
+                  valueFrom:
+                    secretKeyRef:
+                      key: PASS
+                      name: cronjob-auth-secret
+                - name: HOST
+                  valueFrom:
+                    secretKeyRef:
+                      key: HOST
+                      name: cronjob-auth-secret
+                - name: PORT
+                  valueFrom:
+                    secretKeyRef:
+                      key: PORT
+                      name: cronjob-auth-secret
+                - name: DB
+                  valueFrom:
+                    secretKeyRef:
+                      key: DB
+                      name: cronjob-auth-secret
+                - name: REMOTE_HOST
+                  valueFrom:
+                    secretKeyRef:
+                      key: REMOTE_HOST
+                      name: cronjob-auth-secret
+                - name: REMOTE_USER
+                  valueFrom:
+                    secretKeyRef:
+                      key: REMOTE_USER
+                      name: cronjob-auth-secret
+                - name: RSYNC_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: RSYNC_PASSWORD
+                      name: cronjob-auth-secret
+          restartPolicy: Never
+  schedule: "0 8 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
