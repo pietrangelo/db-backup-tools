@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cronjob-db-tools
+  namespace: production
+data:
+  REMOTE_HOST_PATH: /db-backup/
+  BACKUP_NAME_SUFFIX: portal-prod
+  TZ: Europe/Rome
